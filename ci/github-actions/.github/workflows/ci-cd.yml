@@ -1,0 +1,226 @@
+name: Test Automation Pipeline
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  # ========================
+  # 🔹 BUILD STAGE
+  # ========================
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js (UI + Playwright)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install Node dependencies
+        run: |
+          cd test-automation/ui-tests/playwright
+          npm install
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt || true
+          pip install pytest requests allure-pytest prometheus-client
+
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: test-automation/ui-tests/playwright/node_modules
+          key: npm-${{ hashFiles('**/package-lock.json') }}
+
+  # ========================
+  # 🔹 UNIT TESTS (AI FRAMEWORK)
+  # ========================
+  unit-tests:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          pip install pytest allure-pytest
+
+      - name: Run AI unit tests
+        run: |
+          cd test-automation/ai-tests/test-generation
+          pytest --alluredir=../../reports/allure
+
+  # ========================
+  # 🔹 API TESTS (pytest + karate optional)
+  # ========================
+  api-tests:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          pip install pytest requests allure-pytest
+
+      - name: Run API tests (pytest)
+        run: |
+          cd test-automation/api-tests/pytest
+          pytest --junitxml=api-report.xml --alluredir=../../reports/allure
+
+      - name: Upload API Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-report
+          path: test-automation/api-tests/pytest/api-report.xml
+
+  # ========================
+  # 🔹 UI TESTS (Playwright)
+  # ========================
+  ui-tests:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Playwright
+        run: |
+          cd test-automation/ui-tests/playwright
+          npm install
+          npx playwright install
+
+      - name: Run UI tests
+        run: |
+          cd test-automation/ui-tests/playwright
+          npx playwright test --reporter=junit
+
+      - name: Upload UI Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: ui-report
+          path: test-automation/ui-tests/playwright/test-results/
+
+  # ========================
+  # 🔹 SECURITY TESTS (ZAP)
+  # ========================
+  security-tests:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run ZAP Baseline Scan
+        run: |
+          docker run -t owasp/zap2docker-stable zap-baseline.py \
+          -t https://example.com -r zap-report.html
+
+      - name: Upload Security Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-report
+          path: zap-report.html
+
+  # ========================
+  # 🔹 PERFORMANCE TESTS (k6)
+  # ========================
+  performance-tests:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install k6
+        run: sudo apt install -y k6
+
+      - name: Run performance tests
+        run: |
+          cd test-automation/performance-tests/k6
+          k6 run load-test.js
+
+  # ========================
+  # 🔹 AI TESTS (GENERATION + ANALYSIS)
+  # ========================
+  ai-tests:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || true
+          pip install openai pytest
+
+      - name: Run AI Test Framework
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          cd test-automation/ai-tests/test-generation
+          python ai_test_framework.py
+
+  # ========================
+  # 🔹 REPORTING (ALLURE)
+  # ========================
+  report:
+    needs: [unit-tests, api-tests, ui-tests]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Allure CLI
+        run: |
+          npm install -g allure-commandline --save-dev
+
+      - name: Generate Allure Report
+        run: |
+          allure generate test-automation/reports/allure -o allure-report --clean
+
+      - name: Upload Allure Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: allure-report
+
+  # ========================
+  # 🔹 QUALITY GATE
+  # ========================
+  gate:
+    needs: [unit-tests, api-tests, ui-tests, security-tests]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Enforce quality gate
+        run: |
+          echo "Checking test results..."
+          echo "Pipeline fails automatically if any job fails"

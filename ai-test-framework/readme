@@ -1,0 +1,185 @@
+# 🤖 AI-Driven Test Automation Framework
+
+A Python-based framework that leverages AI (LLMs) to automatically generate, execute, and improve API test cases using OpenAPI-like specifications.
+
+---
+
+# 🚀 Features
+
+* ✅ Generate test cases from API specifications
+* ❌ Automatically create negative test scenarios
+* 🧪 Execute API tests dynamically
+* 🧠 AI-powered failure analysis
+* 🔄 Self-expanding test coverage
+
+---
+
+# 📁 Project Structure
+
+```
+ai-test-framework/
+│
+├── ai_test_framework.py      # Main framework logic
+├── openapi_spec.json        # API specification input
+├── config.py                # Configuration (API base URL, model)
+├── utils.py                 # OpenAI + helper functions
+└── requirements.txt         # Dependencies
+```
+
+---
+
+# ⚙️ Setup Instructions
+
+## 1. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 2. Set OpenAI API Key
+
+### Windows (Command Prompt)
+
+```bash
+set OPENAI_API_KEY=sk-yourkeyhere
+```
+
+### macOS / Linux
+
+```bash
+export OPENAI_API_KEY="sk-yourkeyhere"
+```
+
+---
+
+## 3. Configure API Endpoint
+
+Edit `config.py`:
+
+```python
+BASE_URL = "https://api.example.com"
+MODEL = "gpt-4.1"
+```
+
+---
+
+# 📄 API Specification Format
+
+Define your API in `openapi_spec.json`:
+
+```json
+{
+  "endpoint": "/payment/charge",
+  "method": "POST",
+  "description": "Charge a customer payment",
+  "request_body": {
+    "amount": {
+      "type": "number",
+      "required": true,
+      "min": 0
+    },
+    "currency": {
+      "type": "string",
+      "required": true,
+      "example": "USD"
+    },
+    "card_number": {
+      "type": "string",
+      "required": true,
+      "length": 16
+    }
+  }
+}
+```
+
+---
+
+# ▶️ Running the Framework
+
+```bash
+python ai_test_framework.py
+```
+
+---
+
+# 🔄 Workflow
+
+1. Load API specification
+2. Generate positive test cases using AI
+3. Generate negative test cases
+4. Execute API requests
+5. Analyze failures using AI
+6. Expand test coverage dynamically
+
+---
+
+# 🧠 Example AI Prompts
+
+* Generate test cases:
+
+  ```
+  Generate 5 positive test cases for this API
+  ```
+
+* Generate negative cases:
+
+  ```
+  Generate 5 negative test cases for POST /payment/charge
+  ```
+
+* Analyze failures:
+
+  ```
+  Analyze this API failure and suggest root cause and fix
+  ```
+
+---
+
+# 📊 Output
+
+The framework prints:
+
+* ✅ Test execution results
+* ❌ Failed test cases
+* 🧠 AI-generated analysis
+
+---
+
+# ⚠️ Notes
+
+* Ensure your API endpoint is accessible
+* AI responses are validated but may occasionally require cleanup
+* Do not expose your API key publicly
+
+---
+
+# 🔧 Future Improvements
+
+* Integration with pytest
+* Swagger/OpenAPI auto-parser
+* HTML test reports
+* CI/CD pipeline support
+* Parallel test execution
+
+---
+
+# 🤝 Contribution
+
+Feel free to fork and enhance the framework with additional features like:
+
+* Authentication handling
+* Rate limit retries
+* Advanced schema validation
+
+---
+
+# 📌 Summary
+
+This framework demonstrates how AI can:
+
+* Automate test generation
+* Improve test coverage
+* Assist in debugging
+* Continuously evolve test suites
