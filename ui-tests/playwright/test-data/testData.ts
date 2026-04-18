@@ -1,8 +1,8 @@
 export const TEST_DATA = {
     // Credentials for Auth Service
     user: {
-      username: 'testuser',
-      password: 'Password123',
+      username: 'standard_user',
+      password: 'secret_sauce',
     },
     // Search terms for Product Service
     inventory: {
@@ -10,15 +10,15 @@ export const TEST_DATA = {
       expectedProduct: 'Gaming Laptop Pro',
     },
     // Payment Details for Payment Service
-    payment: {
-      cardNumber: '4111111111111111',
-      expiry: '12/28',
-      cvv: '123'
+    checkoutInfo: {
+      firstNme: 'Pete',
+      lastName: 'Mitchell',
+      postalCode: '520207'
     },
     // UI Assertions
     selectors: {
-      confirmationId: '#orderConfirmation',
-      successMessage: 'Success',
+      confirmationId : '[data-test="complete-header"]',
+      successMessage: 'Thank you for your order!',
     }
   };
   

@@ -2,24 +2,26 @@ import { Page, Locator } from '@playwright/test';
 
 export class PaymentPage {
   readonly page: Page;
-  readonly cardNumberInput: Locator;
-  readonly payButton: Locator;
+  readonly firstName: Locator;
+  readonly lastName: Locator;
+  readonly postalCode: Locator;
+  readonly continueBtn: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.cardNumberInput = page.locator('#cardNumber');
-    this.payButton = page.locator('#pay');
+    this.firstName = page.locator('#first-name');
+    this.lastName = page.locator('#last-name');
+    this.postalCode = page.locator('#postal-code');
+    this.continueBtn = page.locator('#continue');
   }
 
-  async executePayment(card: string) {
-    await this.cardNumberInput.fill(card);
-    
-    // Capturing the network call to the Payment Service for debugging
-    const [response] = await Promise.all([
-      this.page.waitForResponse(res => res.url().includes('/api/pay') && res.status() === 200),
-      this.payButton.click(),
-    ]);
-    
-    return response;
+  async populateCheckoutInfo(firstNme: string, lastNme: string, postCode: string) {
+    await this.firstName.fill(firstNme);
+    await this.lastName.fill(lastNme);
+    await this.postalCode.fill(postCode);
   }
+
+  async continueBtnClick() {
+    await this.continueBtn.click();
+  }  
 }

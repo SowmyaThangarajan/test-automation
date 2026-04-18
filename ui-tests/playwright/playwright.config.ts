@@ -25,15 +25,16 @@ export default defineConfig({
 
   /* 3. Reporting & Artifacts */
   reporter: [
-    ['html'], 
+    ['html'],
     ['list'],
-    ['junit', { outputFile: 'results/results.xml' }]
+    ['junit', { outputFile: 'results/results.xml' }],
+    ['allure-playwright']
   ],
 
   /* 4. Shared Settings for all projects */
   use: {
     /* Base URL for the API Gateway / Frontend */
-    baseURL: process.env.BASE_URL || 'https://demo-store.com',
+    baseURL: process.env.BASE_URL || 'https://www.saucedemo.com/',
 
     /* 5. Screenshot & Video Capture for Failures */
     trace: 'retain-on-failure',      // Records DOM, Network, and Console
