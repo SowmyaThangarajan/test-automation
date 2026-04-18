@@ -1,6 +1,7 @@
 from utils.client import get
 import pytest
 
+#💉 SQL Injection
 @pytest.mark.test
 
 def test_sql_injection_login():

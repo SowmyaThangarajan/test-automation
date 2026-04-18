@@ -3,6 +3,7 @@ import pytest
 
 from utils.schema_validator import validate_schema
 
+# Validate performance threshold
 def test_create_order(client):
     start = time.time()
 

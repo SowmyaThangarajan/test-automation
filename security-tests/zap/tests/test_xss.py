@@ -1,6 +1,7 @@
 from utils.client import get
 import pytest
 
+#⚡ XSS Attack
 @pytest.mark.test
 
 def test_xss_attack():

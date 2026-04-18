@@ -2,6 +2,7 @@ import jwt
 from utils.client import get
 import pytest
 
+#JWT Manipulation
 @pytest.mark.test
 
 def test_jwt_tampering():

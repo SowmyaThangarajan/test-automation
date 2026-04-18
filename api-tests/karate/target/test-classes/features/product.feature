@@ -4,23 +4,28 @@ Background:
   * url baseUrl
   * def productSchema = read('classpath:schemas/product-schema.json')
 
-Scenario: Validate product list schema
+Scenario: Validate product list schema (strict)
   Given path '/products'
   When method GET
   Then status 200
 
   # Validate entire response schema
-  And match each response == productSchema
+  And match each response contains only productSchema
 
 Scenario: Detect breaking changes (strict contract)
   Given path '/products'
   When method GET
   Then status 200
 
-  # Required fields must exist
-  And match response[0].id != null
-  And match response[0].name != null
-  And match response[0].price != null
+  And match each response ==
+  """
+  {
+    id: '#number',
+    name: '#string',
+    price: '#number',
+    description: '##string'   # optional
+  }
+  """
 
 Scenario: Validate data types (contract enforcement)
   Given path '/products'

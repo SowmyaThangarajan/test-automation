@@ -1,6 +1,7 @@
 from utils.client import get
 import pytest
 
+#🚦 Rate Limiting
 @pytest.mark.test
 
 def test_rate_limiting():
